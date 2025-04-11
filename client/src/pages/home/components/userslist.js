@@ -2,10 +2,10 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { CreateChats } from '../../../apiCalls/chat'
 import { hideLoader, showLoader } from "../../../redux/loaderSlice";
-import { setAllChats } from "../../../redux/usersSlice";
+import { setAllChats, setselectedChats } from "../../../redux/usersSlice";
 function UsersList({searchKey}){
     /// calling the allusers routes from the database.
-const { allUsers, allChats, user: currentUser} = useSelector(state => state.userReducer);
+const { allUsers, allChats, user: currentUser, selectedChats} = useSelector(state => state.userReducer);
 /// so inside the createchat function we will pass 2 arguements 
 //////1
 const dispatch = useDispatch();
@@ -25,12 +25,40 @@ const StartNewChat = async (searchedUserId) =>{
         const newchat = response.data;
         const updatedChat = [...allChats, newchat]; //// ....allChats keeps the data of old chat and newChat variale stores the data of the new chat
         dispatch(setAllChats(updatedChat));
+        dispatch(setselectedChats(updatedChat));
        }
     }catch(error){
      toast.error(response.message);
      dispatch(hideLoader());
     }
 }
+
+///// remember to keep the selectedUserId
+//// the selectedUserId is gotten based on the parametres given.
+const openChat = (selectedUserId) =>{
+    //// we want to find the chats of the two ids
+const chat = allChats.find(chat =>
+     chat.members.map(m => m._id).includes(currentUser._id)
+&& chat.members.map(m => m._id).includes(selectedUserId))
+
+if(chat){
+    dispatch(setselectedChats(chat))
+}                             
+}
+
+/*
+Now this fucntion will be used to prevent all users's div from
+beign highlighted in the list.
+*/
+const isSelectedChat = (user) => {
+    if (selectedChats && Array.isArray(selectedChats.members)) {
+      // Using map to loop only for the user_id of the selected users.
+      return selectedChats.members.map(sc => sc._id).includes(user._id);
+    }
+    return false;
+  };
+  
+
 return(
     allUsers.filter(user =>{
         return (
@@ -41,16 +69,16 @@ return(
             user.lastname.toLowerCase().includes(searchKey.toLowerCase())
         ) && searchKey)
          //// this code will make sure it displays only a character is typed there...the second option is 
-        ||  (allChats.some(chats => chats.members.includes(user._id)))
+        ||  (allChats.some(chats => chats.members.map(m => m._id).includes(user._id)))
     })
     
     .map(user => {
         return (
-            <div class="user-search-filter">
-   <div class="filtered-user">
-       <div class="filter-user-display">
+            <div className="user-search-filter" onClick={()=>openChat(user._id)} key={user._id}>
+   <div className={ isSelectedChat(user) ? "selected-user": "filtered-user" }>
+       <div className="filter-user-display">
            {user.profilePic && <img src={user.profilePic} alt="Profile Pic" class="user-profile-image"/>}
-           {!user.profilePic && <div class="user-default-profile-pic">
+           {!user.profilePic && <div className={ isSelectedChat(user)? "user-selected-avatar" : "user-default-avatar" }>
                { user.firstname.charAt(0).toUpperCase() +
                  user.lastname.charAt(0).toUpperCase()
                }
@@ -60,7 +88,7 @@ return(
                    <div class="user-display-email">{user.email || 'No Email at all '}</div>
                </div>
                { 
-                 !allChats.find(chats => chats.members.includes(user._id)) &&
+                 !allChats.find(chats => chats.members.map(m => m._id).includes(user._id)) &&
                <div class="user-start-chat">
                   <button class="user-start-chat-btn" 
                   onClick={()=> {StartNewChat(user._id)}}
