@@ -3,6 +3,9 @@ import toast from "react-hot-toast";
 import { CreateChats } from '../../../apiCalls/chat'
 import { hideLoader, showLoader } from "../../../redux/loaderSlice";
 import { setAllChats, setselectedChats } from "../../../redux/usersSlice";
+import moment  from "moment";
+
+
 function UsersList({searchKey}){
     /// calling the allusers routes from the database.
 const { allUsers, allChats, user: currentUser, selectedChats} = useSelector(state => state.userReducer);
@@ -32,6 +35,35 @@ const StartNewChat = async (searchedUserId) =>{
      dispatch(hideLoader());
     }
 }
+
+
+const getLastMessageTimestamp = (userId) =>{
+    const chat = allChats.find(chat => chat.members.map(my => my._id).includes(userId))
+    if(!chat && chat?.lastMessage){
+      return " ";
+    }else{
+     //// we will display You and the one who sent the last message.
+        return moment(chat?.lastMessage?.createdAt).format('hh:mm A');
+    }
+}
+
+
+///// Getting the last message
+const GetLastMessage = (userId) =>{
+  const chat = allChats.find(chat => chat.members.map(my => my._id).includes(userId))
+  if(!chat){
+    return "";
+  }else{
+   //// we will display You and the one who sent the last message.
+    const msgPrefx = chat?.lastMessage?.sender === currentUser._id? "You: " : "";
+
+    return msgPrefx + chat?.lastMessage?.text?.substring(0, 25);
+  }
+}/// display this function into where our email is displayed.
+
+
+
+
 
 ///// remember to keep the selectedUserId
 //// the selectedUserId is gotten based on the parametres given.
@@ -85,8 +117,9 @@ return(
            </div>}
            <div class="filter-user-details">
                <div class="user-display-name">{user.firstname + " " + user.lastname}</div>
-                   <div class="user-display-email">{user.email || 'No Email at all '}</div>
+                   <div class="user-display-email">{  GetLastMessage(user._id) || user.email }</div>
                </div>
+               <div>{getLastMessageTimestamp(user._id)}</div>
                { 
                  !allChats.find(chats => chats.members.map(m => m._id).includes(user._id)) &&
                <div class="user-start-chat">

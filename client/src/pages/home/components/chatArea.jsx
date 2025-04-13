@@ -4,7 +4,9 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { createNewMessage, getAllMessage} from '../../../apiCalls/message'
 import { hideLoader, showLoader } from "../../../redux/loaderSlice"; 
+import moment from 'moment';
 
+/// install moment.
 function ChatArea(){ 
 const dispatch = useDispatch(); 
 const { selectedChats, user } = useSelector(state => state.userReducer); 
@@ -34,6 +36,22 @@ const sendMessage = async () => {
           
 }
    
+/// checking the time
+const formatTime = (timestamp) =>{
+const now = moment();
+const diff = now.diff(moment(timestamp), 'days')
+
+    if(diff < 1){
+        return `Today ${moment(timestamp).format('hh:mm A')}`
+      }else if (diff >= 24 && diff < 48 ){
+        return `Yesterday ${moment(timestamp).format('hh:mm A')}`;
+        }else {
+          return moment(timestamp).format('MMMM, D hh:mm A');
+     }
+      }
+
+
+
 //// a function to getMessages
 const getMessages = async () => {
   try{ 
@@ -70,7 +88,16 @@ getMessages();
                           /// we must return in other to display it
                           const isCurrentUserSender = msg.sender === user._id;
                            return <div className="message-container" style={isCurrentUserSender? {justifyContent: 'end'} : {justifyContent: 'start'} }>
-                           <div className={isCurrentUserSender?"send-message" : "received-message"}>{msg.text}</div>
+                          <div>  
+                           <div className={isCurrentUserSender?"send-message" : "received-message"}>
+                            {msg.text}
+
+                           </div>
+
+                            <div className="message-timestamps" style={isCurrentUserSender? {float: 'right'} : {float: 'left'}}>
+                              {formatTime(msg.createdAt)}
+                              </div>
+                            </div>
                        </div>
                          })}
                 
