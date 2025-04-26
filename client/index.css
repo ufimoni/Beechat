@@ -402,3 +402,7 @@ flex: 1;
   color: #28282B;
   margin-right: 100px;
 }
+.message-timestamp{
+  width: fit-content;
+  font-size: 13px;
+}

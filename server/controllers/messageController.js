@@ -1,4 +1,4 @@
-const Chats = require('./../models/chatmodel'); // please require the chatmodel or chatschema
+const Chats = require('../models/chatmodel'); // please require the chatmodel or chatschema
 
 const Message = require('./../models/messagemodel'); //// Please always Require the MessageSchema.
 

@@ -12,34 +12,38 @@ const { allUsers, allChats, user: currentUser, selectedChats} = useSelector(stat
 /// so inside the createchat function we will pass 2 arguements 
 //////1
 const dispatch = useDispatch();
-const StartNewChat = async (searchedUserId) =>{
-    let response = null;
-    try{
-        dispatch(showLoader());
-        response =  await CreateChats([currentUser._id,searchedUserId]);  /// this fumcton is called from the api and it is expecting an array
-        dispatch(hideLoader());
+///1. First
+const StartNewChat = async (searchedUserId) => {
+  let response = null;
+  try {
+    dispatch(showLoader());
+    response = await CreateChats([currentUser._id, searchedUserId]); // This function expects an array
+    dispatch(hideLoader());
 
-        /*
-        1. check if the create chat request is successfull
-        2. Update the setAllchat functions. that is updating the changes made in the all chats.
-        */
-       if(response.success){
-        toast.success(response.message);
-        const newchat = response.data;
-        const updatedChat = [...allChats, newchat]; //// ....allChats keeps the data of old chat and newChat variale stores the data of the new chat
-        dispatch(setAllChats(updatedChat));
-        dispatch(setselectedChats(updatedChat));
-       }
-    }catch(error){
-     toast.error(response.message);
-     dispatch(hideLoader());
+    if (response.success) {
+      toast.success(response.message);
+      const newChat = response.data;
+
+      // Find the user to populate selectedChats
+      const selectedUser = allUsers.find(user => user._id === searchedUserId);
+
+      const updatedChat = [...allChats, newChat]; // Keep old chats and add new chat
+      dispatch(setAllChats(updatedChat));
+
+      // Set selectedChats with full data (chat and user details)
+      dispatch(setselectedChats({ ...newChat, members: [...newChat.members, selectedUser] }));
     }
-}
+  } catch (error) {
+    toast.error(response.message || "An error occurred!");
+    dispatch(hideLoader());
+  }
+};
 
 
+////2.
 const getLastMessageTimestamp = (userId) =>{
     const chat = allChats.find(chat => chat.members.map(my => my._id).includes(userId))
-    if(!chat && chat?.lastMessage){
+    if(!chat || chat?.lastMessage){
       return " ";
     }else{
      //// we will display You and the one who sent the last message.
@@ -47,24 +51,27 @@ const getLastMessageTimestamp = (userId) =>{
     }
 }
 
-
+////3.
 ///// Getting the last message
-const GetLastMessage = (userId) =>{
-  const chat = allChats.find(chat => chat.members.map(my => my._id).includes(userId))
-  if(!chat){
-    return "";
-  }else{
-   //// we will display You and the one who sent the last message.
-    const msgPrefx = chat?.lastMessage?.sender === currentUser._id? "You: " : "";
-
-    return msgPrefx + chat?.lastMessage?.text?.substring(0, 25);
+const GetLastMessage = (userId) => {
+    const chat = allChats.find(chat => chat.members.map(my => my._id).includes(userId));
+    if (!chat || !chat.lastMessage) {
+      return "";
+    } else {
+      const msgPrefx = chat?.lastMessage?.sender === currentUser._id ? "You: " : "";
+      return msgPrefx + chat?.lastMessage?.text?.substring(0, 25);
+    }
+  };
+  const GetUnreadMessageCount = (userId) =>{
+    const chat = allChats.find(chat => chat.members.map(m => m._id).includes(userId));
+    if(chat && chat.unReadMessageCount && chat.lastMessage.sender !== currentUser._id){
+    return <div className="unread-message-counter"> {chat.unReadMessageCount} </div>
+    }
+  else{
+        return "";
+    }
   }
-}/// display this function into where our email is displayed.
-
-
-
-
-
+/////4.
 ///// remember to keep the selectedUserId
 //// the selectedUserId is gotten based on the parametres given.
 const openChat = (selectedUserId) =>{
@@ -91,20 +98,34 @@ const isSelectedChat = (user) => {
   };
   
 
-return(
+function FormatName(user){
+let fname = user.firstname.at(0).toUpperCase() + user.firstname.slice(1).toLowerCase();
+let lname = user.lastname.at(0).toUpperCase() + user.lastname.slice(1).toLowerCase();
+
+return fname+ ' ' +lname
+} 
+
+
+///// Display the latest updated message sent to the current user who is selecetd
+function getData(){
+  if(searchKey === ""){
+   return allChats;
+  }else{
     allUsers.filter(user =>{
-        return (
-            // The first option is 
-            (
-            
-            user.firstname.toLowerCase().includes(searchKey.toLowerCase()) ||
-            user.lastname.toLowerCase().includes(searchKey.toLowerCase())
-        ) && searchKey)
-         //// this code will make sure it displays only a character is typed there...the second option is 
-        ||  (allChats.some(chats => chats.members.map(m => m._id).includes(user._id)))
+      return user.firstname.toLowerCase().includes(searchKey.toLowerCase()) ||
+      user.lastname.toLowerCase().includes(searchKey.toLowerCase())
     })
+  }
+}
+
+return(
     
-    .map(user => {
+  getData()
+    .map(obj => {
+      let user = obj;
+      if(obj.members){
+        user = obj.members.find(mem => mem._id !== currentUser._id)
+      }
         return (
             <div className="user-search-filter" onClick={()=>openChat(user._id)} key={user._id}>
    <div className={ isSelectedChat(user) ? "selected-user": "filtered-user" }>
@@ -116,10 +137,18 @@ return(
                }
            </div>}
            <div class="filter-user-details">
-               <div class="user-display-name">{user.firstname + " " + user.lastname}</div>
+               <div class="user-display-name">{FormatName(user)}</div>
                    <div class="user-display-email">{  GetLastMessage(user._id) || user.email }</div>
                </div>
-               <div>{getLastMessageTimestamp(user._id)}</div>
+                      
+
+                  {/*------------This div carries both get UnreadMessage Count and 
+                    timestamps----------------------------------------------------
+                  -------------*/}   
+                <div> 
+               { GetUnreadMessageCount(user._id) } 
+               <div className="last-message-timestamp">{getLastMessageTimestamp(user._id)}</div>
+              </div> 
                { 
                  !allChats.find(chats => chats.members.map(m => m._id).includes(user._id)) &&
                <div class="user-start-chat">
