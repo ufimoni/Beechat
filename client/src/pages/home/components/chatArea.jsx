@@ -134,8 +134,11 @@ const ClearedUnreadMessages = async () => {
    
   })
   }, [selectedChats]);
-/// creating an atimatic scroll effect.
-
+/// creating an automatic scroll effect.
+useEffect(() =>{
+  const msgController = document.getElementById('main-chat-area')
+        msgController.scrollTop = msgController.scrollHeight;
+}, [allMessages])
 
   // Render the component
   return (
@@ -145,7 +148,7 @@ const ClearedUnreadMessages = async () => {
           <div className="app-chat-area-header">
             {FormatName(selectedUser)}
           </div>
-          <div className="main-chat-area">
+          <div className="main-chat-area" id="main-chat-area">
             {allMessages?.map(msg => {
               const isCurrentUserSender = msg.sender === user?._id;
               return (
