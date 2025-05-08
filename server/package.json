@@ -1,5 +1,5 @@
 {
-  "name": "test-chat-server",
+  "name": "Bee-chat-server",
   "version": "1.0.0",
   "description": "this is a chatting application for bertcode.py teams.",
   "main": "app.js",

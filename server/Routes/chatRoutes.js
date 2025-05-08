@@ -10,5 +10,8 @@ router.route('/create-new-chat')
 router.route('/get-all-chats')
        .get(authMiddleware,chatControl.getAllChats);
 
+router.route('/clear-unread-message')
+       .post(authMiddleware, chatControl.ClearChatMessage);       
+
 
 module.exports = router;

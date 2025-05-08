@@ -4,9 +4,11 @@ import { CreateChats } from '../../../apiCalls/chat'
 import { hideLoader, showLoader } from "../../../redux/loaderSlice";
 import { setAllChats, setselectedChats } from "../../../redux/usersSlice";
 import moment  from "moment";
+import { useEffect } from "react";
+import store from '../../../redux/store'
 
 
-function UsersList({searchKey}){
+function UsersList({searchKey, socket, onlineUsers}){
     /// calling the allusers routes from the database.
 const { allUsers, allChats, user: currentUser, selectedChats} = useSelector(state => state.userReducer);
 /// so inside the createchat function we will pass 2 arguements 
@@ -107,16 +109,56 @@ return fname+ ' ' +lname
 
 
 ///// Display the latest updated message sent to the current user who is selecetd
-function getData(){
-  if(searchKey === ""){
-   return allChats;
-  }else{
-    allUsers.filter(user =>{
-      return user.firstname.toLowerCase().includes(searchKey.toLowerCase()) ||
-      user.lastname.toLowerCase().includes(searchKey.toLowerCase())
-    })
+function getData() {
+  if (searchKey === "") {
+    return allChats;
+  } else {
+    return allUsers
+      .filter(user =>
+        user.firstname.toLowerCase().includes(searchKey.toLowerCase()) ||
+        user.lastname.toLowerCase().includes(searchKey.toLowerCase())
+      )
+      .map(user => {
+        // Find chat for this user
+        const chat = allChats.find(chat =>
+          chat.members.some(m => m._id === user._id)
+        );
+        return chat ? chat : { members: [user] }; // Return placeholder chat if none exists
+      });
   }
 }
+
+//// when ever a new message is recieved while chatting with another user. unread message should be displayed
+useEffect(() =>{
+socket.on('receive-message', (message) =>{
+const selectedChats = store.getState().userReducer.selectedChats || {}
+let allChats = store.getState().userReducer.allChats 
+if (selectedChats && selectedChats?._id !== message?.chatId) {
+  const updatedChat = allChats.map(chat => {
+    if(chat?._id === message?.chatId){ 
+       return {
+        ...chat,
+        unReadMessageCount: (chat?.unReadMessageCount || 0 ) + 1,
+        lastMessage: message
+       }
+    }else{
+      return chat;
+      }
+  }); 
+  allChats = updatedChat;
+  
+}
+//1. Find the Latest Chat
+const latestChat = allChats.find(chat => chat._id === message.chatId)
+//2. Get All Other chats
+const OtherChats = allChats.filter(chat => chat._id !== message.chatId)
+//3. Create a new array latest chat on top and then other chats below
+allChats = [latestChat, ...OtherChats];
+dispatch(setAllChats(allChats))
+})
+}, [])
+
+
 
 return(
     
@@ -126,12 +168,24 @@ return(
       if(obj.members){
         user = obj.members.find(mem => mem._id !== currentUser._id)
       }
+      if(!user) return null;
         return (
-            <div className="user-search-filter" onClick={()=>openChat(user._id)} key={user._id}>
-   <div className={ isSelectedChat(user) ? "selected-user": "filtered-user" }>
-       <div className="filter-user-display">
-           {user.profilePic && <img src={user.profilePic} alt="Profile Pic" class="user-profile-image"/>}
-           {!user.profilePic && <div className={ isSelectedChat(user)? "user-selected-avatar" : "user-default-avatar" }>
+
+  <div className="user-search-filter"
+   onClick={()=>openChat(user._id)} 
+   key={user._id}>
+  <div className={ isSelectedChat(user) ? "selected-user": "filtered-user" }>
+       <div className="filter-user-display">{user.profilePic && 
+                <img src={user.profilePic} 
+                 alt="Profile Pic" 
+                 className="user-profile-image"
+                 style={onlineUsers.includes(user._id)? {border: '#82e0aa 3px solid'} : {} }
+       />}
+           {!user.profilePic && 
+           <div className={ isSelectedChat(user)? "user-selected-avatar" : "user-default-avatar"}
+           style={onlineUsers.includes(user._id)? {border: '#82e0aa 3px solid'} : {} }
+
+          >
                { user.firstname.charAt(0).toUpperCase() +
                  user.lastname.charAt(0).toUpperCase()
                }

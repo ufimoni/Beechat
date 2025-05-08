@@ -1,5 +1,6 @@
 const Users = require('./../models/usermodel');
 const jwt = require('jsonwebtoken');
+const cloudinary = require('../cloudinary');
 
 exports.getUserDetail = async (req, res) => {
     try {
@@ -53,4 +54,35 @@ exports.getAllUsers = async (req, res) => {
             success: false
         });
     }
+};
+/// to uplaod profile pic from ui to cloudinary
+exports.uploadProfilePic = async (req, res) =>{
+try{
+ const image = req.body.image;
+/// UPLOAD THE IMAGE TO CLOUDINARY
+const uploadedImage = await cloudinary.uploader.upload(image, {
+    folder: 'bee-chat',
+    format: 'jpg',
+    transformation: [
+        { width: 800, height: 800, crop: "limit" }
+    ]
+})  
+
+/// UPDATE THE USER MODEL & SET THE PROFILE PIC PROPERTY
+const user = await Users.findByIdAndUpdate({
+                     _id: req.body.userId},
+                    {profilePic: uploadedImage.secure_url },
+                    {new: true})
+
+res.send({
+    message: 'Profile Picture Uploaded Successfully..',
+    success: true,
+    data: user
+})
+}catch(error){
+    res.send({
+        message: error.message,
+        sucess: false
+    })
+}
 };

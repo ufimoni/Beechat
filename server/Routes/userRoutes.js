@@ -9,4 +9,7 @@ router.route('/get-logged-user')
 
 router.route('/get-All-users')
        .get(authMiddleware, userControl.getAllUsers);
+
+router.route('/upload-profile-pic')  
+       .post(authMiddleware, userControl.uploadProfilePic)     
 module.exports = router;

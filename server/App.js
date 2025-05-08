@@ -8,8 +8,12 @@ const chatrouter = require('./Routes/chatRoutes')
 const messageRouter = require('./Routes/messageRoutes');
 const app = express();
 // convert the incoming json data in js object
-app.use(express.json());
 
+app.use(express.json({ limit: '30mb' }));
+app.use(express.urlencoded({ extended: true, limit: '30mb' }));
+
+//app.use(morgan('dev'))
+app.use(cors()); /// for deployment in the production server.
 const server = require('http').createServer(app); /// for the http only
 //// create the socket.io connection
 
@@ -18,8 +22,6 @@ const io = require('socket.io')(server, {cors:{
   methods: ['GET', 'POST']
 } })
 
-app.use(morgan('dev'))
-app.use(cors());
 
 const corsOptions = {
     origin: 'http://localhost:3000', // Replace this with your frontend URL
@@ -27,6 +29,8 @@ const corsOptions = {
     allowedHeaders: 'Content-Type,Authorization', // Allowed headers
     credentials: true, // Allow cookies to be sent
   };
+
+const onlineUsers = [];
 
 app.use(cors(corsOptions))
 
@@ -57,6 +61,33 @@ socket.on('send-message', (message) => {
   .to(message.members[0])
   .to(message.members[1])
   .emit('receive-message', message)
+})
+socket.on('clear-unread-messages', data =>{
+  io.to(data.members[0])
+    .to(data.members[1])
+    .emit('message-count-cleared', data)
+}) /// this code will be handled by useEffect() in frontend to complete the circle
+
+/// socket for handling the typing-message event
+socket.on('user-typing', (data)=>{
+  io
+  .to(data.members[0])
+  .to(data.members[1])
+  .emit('started-typing', data)
+})
+/*Here we to add it to all Online users 
+that is why we are pushing the data to the array.*/
+socket.on('user-login', UserId =>{
+if(!onlineUsers.includes(UserId)){
+  onlineUsers.push(UserId)
+}
+socket.emit('online-user',onlineUsers); // we pass the onlineUsers array as the second parameter.
+})
+
+//// filter out or remove offline users
+socket.on('user-offline', userId =>{
+  onlineUsers.splice(onlineUsers.indexOf(userId), 1)
+  io.emit('online-users-active',onlineUsers);
 })
 })
 module.exports = server; 

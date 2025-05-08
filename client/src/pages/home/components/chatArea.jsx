@@ -6,7 +6,11 @@ import { hideLoader, showLoader } from "../../../redux/loaderSlice";
 import { clearunreadMessagecount } from '../../../apiCalls/chat';
 import store from '../../../redux/store';
 
+import EmojiPicker from 'emoji-picker-react'
+
 import moment from 'moment';
+import { setAllChats } from "../../../redux/usersSlice";
+
 
 function ChatArea({socket}) {
   const dispatch = useDispatch();
@@ -14,11 +18,14 @@ function ChatArea({socket}) {
   const selectedUser = selectedChats?.members?.find(us => us?._id !== user?._id);
   const [message, setMessage] = useState('');
   const [allMessages, setAllMessages] = useState([]);
-
+  const [isTyping, setIsTyping] = useState(false);
+  const [showEmojiPicker, setshowEmojiPicker] = useState(false);
+  const [ data, setData] = useState(null);
 
   // Function to send a new message
-  const sendMessage = async () => {
-    if (!message.trim()) {
+  /// and also images which was modified the image will be passed as parameter
+  const sendMessage = async (image) => {
+    if (!message.trim() && !image) {
       toast.error("Message cannot be empty!");
       return;
     }
@@ -26,7 +33,8 @@ function ChatArea({socket}) {
       const newMessage = {
         chatId: selectedChats?._id,
         sender: user?._id,
-        text: message
+        text: message,
+        image: image
       };
   socket.emit('send-message', {
     ...newMessage,
@@ -65,9 +73,8 @@ function ChatArea({socket}) {
   const getMessages = async () => {
     if (!selectedChats?._id) return;
     try {
-      dispatch(showLoader());
       const response = await getAllMessage(selectedChats._id);
-      dispatch(hideLoader());
+
       if (response.success) {
         setAllMessages(response.data);
       } else {
@@ -84,7 +91,10 @@ function ChatArea({socket}) {
 const ClearedUnreadMessages = async () => {
   if (!selectedChats?._id) return;
   try {
-  
+      socket.emit('clear-unread-messages', {
+        chatId: selectedChats._id,
+        members: selectedChats.members.map(m => m._id)
+      })
     const response = await clearunreadMessagecount(selectedChats._id);
     if (response.success) {
       allChats.map(chat => {
@@ -101,14 +111,20 @@ const ClearedUnreadMessages = async () => {
       toast.error("Failed to fetch messages!");
     }
   } catch (error) {
-    dispatch(hideLoader());
     toast.error(error.message || "An error occurred!");
   }
 };
+ //// To send Image
+const sendImage = async (e) =>{
+const file = e.target.files[0];
+const reader = new FileReader(file);
 
+reader.readAsDataURL(file);
 
-
-
+reader.onloadend = async () =>{
+  sendMessage(reader.result);
+}
+} 
 
 
   // Format the selected user's full name
@@ -126,13 +142,53 @@ const ClearedUnreadMessages = async () => {
     ClearedUnreadMessages();
   }// here we want the unread message cleared when the reciever recieves it.
   //// listening to the receive-message event
-  socket.off('receive-message').on('receive-message', (data) =>{
+  socket.on('receive-message', (message) =>{
     const selectedChats = store.getState().userReducer.selectedChats;
-    if(selectedChats._id === data.chatId){
-      setAllMessages(prevmsg => [...prevmsg,data])
+    if(selectedChats?._id === message.chatId){
+      setAllMessages(prevmsg => [...prevmsg, message])
     }
-   
+    else if(selectedChats?._id === message.chatId && message.sender !== user._id){
+    clearunreadMessagecount();
+    }
+   socket.on('message-count-cleared', data =>{
+    const selectedChats = store.getState().userReducer.selectedChats;
+    const allChats = store.getState().userReducer.allChats;
+    /// checking of the selectedChat matches the incoming chat array stord in the data variable.
+    if(selectedChats._id === data.chatId){
+      //// updating the unread message count
+      const updatedchat = allChats.map(chat =>{
+        if(chat._id === data.chatId){
+        return {
+          ...chat,
+          unreadMessageCount: 0
+        }
+        }
+          return chat;
+      
+      })
+      
+     dispatch(setAllChats(updatedchat))
+      ////// Updating the read property in the message Object.
+       setAllMessages(prevmsg =>{
+        return prevmsg.map(msg => {
+                return { ...msg, read: true}
+        })
+       })
+
+
+    } 
+   })
   })
+
+    /// handling the started typing
+    socket.on('started-typing',(data)=>{
+      if(selectedChats._id === data.chatId && data.sender !== user._id){
+        setIsTyping(true);
+        setTimeout(()=>{
+          setIsTyping(false);
+        }, 3000)
+      }
+     })
   }, [selectedChats]);
 /// creating an automatic scroll effect.
 useEffect(() =>{
@@ -159,8 +215,11 @@ useEffect(() =>{
                 >
                   <div>
                     <div className={isCurrentUserSender ? "send-message" : "received-message"}>
-                      {msg.text}
+                      <div>{msg.text}</div> {/*wrap it within a div*/}
                     </div>
+                     {/*This code will enable users to send images*/}
+                      <div> {msg.image && <img src={msg.image} alt="image" height='120' width='120'/>} </div>
+              
                     <div 
                       className="message-timestamps" 
                       style={isCurrentUserSender ? { float: 'right' } : { float: 'left' }}
@@ -176,19 +235,59 @@ useEffect(() =>{
               );
             })}
           </div>
-
+            {/*Display a typing indicator*/}
+            {/*an additional code to display typing indicator to only when a chat is selected*/}
+                      <div className="typing-indicate">{ isTyping && selectedChats?.members.map(mi => mi._id).
+                                                            includes(data?.sender) && <i>typing...</i>}</div> 
+               {/*Display the Emojis here*/}
+            { 
+              showEmojiPicker &&
+              <div className="send-message-wrapper" style={{ position: 'absolute',
+                bottom: '60px', // Adjust height above input box
+                right: '80px',
+                zIndex: 1000,
+                boxShadow: '0 0 10px rgba(0,0,0,0.2)'}}> 
+              <EmojiPicker onEmojiClick={(e) => setMessage(message + e.emoji)}/> 
+          </div>
+            }  
           <div className="send-message-div">
             <input 
               type="text" 
               className="send-message-input" 
               placeholder="Type a message" 
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
+              onChange={(e) => {  setMessage(e.target.value)
+              socket.emit('user-typing', {
+                chatId: selectedChats._id,
+                members: selectedChats.members.map(m => m._id),
+                sender: user._id // we are storing the id of the curremt sender
+              })
+
+              }}
+            /> 
+            {/*Enable users to be able to send message we use an i class*/}
+            <label htmlFor="file">
+            <i className="fa fa-picture-o send-image-btn"></i>
+             {/*Create an input that will not be visible to accept images
+            this input will not be seen
+            */}
+             <input type="file"
+              id="file"
+              style={{display: 'none'}}
+              accept="image/jpg,image/jpeg,image/png,image/gif,image/webp"
+              onChange={sendImage}
+             />
+            </label>
+        
+             <button 
+              className="fa fa-smile-o send-emoji-btn" 
+              aria-hidden="true" 
+              onClick={()=>{setshowEmojiPicker(!showEmojiPicker)}}
+            ></button>
             <button 
               className="fa fa-paper-plane send-message-btn" 
               aria-hidden="true" 
-              onClick={sendMessage}
+              onClick={ ()=> sendMessage('')}
             ></button>
           </div>
         </div>

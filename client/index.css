@@ -1,6 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
 
+
+
+
+
 /*This is the rest of the other styling*/
 
 * {
@@ -9,7 +13,9 @@
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
 }
-
+body{
+  overflow-y: hidden; 
+}
 
 
 .container-back-img{
@@ -19,7 +25,7 @@
   width: 100%;
   height: 100%;
   position: absolute;
-  z-index: -2;
+  z-index: -1;
 }
 .container-back-color{
   background-color: #4796ff;
@@ -227,6 +233,56 @@ padding: 10px 10px;
 flex: 1;
 }
 
+/*******************************************************
+********CSS FOR HEADER COMPONENT************************
+********************************************************/
+.app-header{
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 10px 30px;
+  justify-content: space-between;
+  border-bottom: #bbb 1px solid;
+}
+
+.app-logo{
+  display: flex;
+  flex-wrap: nowrap;
+  color: #28282B;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+i{
+  margin: 5px 10px;
+}
+
+.app-user-profile{
+  display: flex;
+}
+
+.logged-user-name{
+  color: #28282B;
+  font-weight: bold;
+  padding-top: 10px;
+  padding-right: 20px;
+}
+
+.logged-user-profile-pic{
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #3c7ee7;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 40px;
+}
+
+
 /*-------------------------------------------------------------
 ------------------------------CSS styling for the sidebar------------------*/
 
@@ -263,16 +319,18 @@ flex: 1;
 ------------------------------CSS FOR DISPLAYING THE USERSLISTS------------------*/
 .filtered-user{
   border-bottom: #ccc 1px solid;
-  width: 310px; 
-  padding: 10px 10px;
+  width: 290px; 
+  padding: 9px 10px;
+  border-radius: 2px;
   color: #28282B;
   cursor: pointer;
   background-color: white;
 }
 .selected-user{
   border-bottom: #ccc 1px solid;
-  width: 310px; 
-  padding: 10px 10px;
+  width: 290px; 
+  padding: 9px 10px;
+  border-radius: 2px;
   color: white;
   cursor: pointer;
   background-color:#4796ff;
@@ -283,11 +341,11 @@ flex: 1;
   flex-wrap: column;
 }
 .filter-user-details{
-  width: 60%;
+  width: 50%;
 }
 .user-display-name{
   padding: 1px 20px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: bold;
 }
 .user-display-email{
@@ -299,7 +357,7 @@ flex: 1;
   width: 50px;
   height: 50px;
   border-radius: 50%;
- 
+  
   font-size: 22px;
   font-weight: bold;
   text-align: center;
@@ -334,7 +392,7 @@ flex: 1;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  min-height: 70vh;
+  height: 85vh;
 }
 
 /*******************************************************
@@ -347,14 +405,18 @@ flex: 1;
     text-align: right;
     font-weight: bold;
     color: #4796ff;
+    cursor: pointer;
 }
 
 /*****************************************************************************************************
 ******************************************MESSAGE AND CHAT INPUT CSS STYLES***********/
 .main-chat-area{
 flex: 1;
+overflow-y: scroll;
+padding: 10px 20px;
 }
 .send-message-div{
+  margin-top: 20px;
   position: relative;
 }
 .send-message-input{
@@ -375,6 +437,51 @@ flex: 1;
   border: none;
   background-color: transparent;
 }
+.send-emoji-btn{
+  position: absolute;
+  right: 50px;
+  font: 10px;
+  color: #3c86e7;
+  cursor: pointer;
+  margin-top: 5px;
+  border: none;
+  background-color: transparent;
+}
+.send-image-btn{
+  position: absolute;
+  right: 80px;
+  font: 10px;
+  color: #3c86e7;
+  cursor: pointer;
+  margin-top: 5px;
+  border: none;
+  background-color: transparent;
+}
+
+/*********************************************************************************
+*********************************CSS FOR SCROLLING THE SIDE BAR*****************/
+.main-chat-area::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+.main-chat-area::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 2px grey; 
+  border-radius: 10px;
+}
+
+/* Handle */
+.main-chat-area::-webkit-scrollbar-thumb {
+  background: #3c86e7; 
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+.main-chat-area::-webkit-scrollbar-thumb:hover {
+  background: #3c86e7; 
+}
+
+
 
 
 /*******************************************************
@@ -386,7 +493,7 @@ flex: 1;
 .send-message, .received-message{
   padding: 10px 20px;
   margin-top: 5px;
-  border-radius: 3px;
+  border-radius: 10px;
   font-size: 14px;
   width: fit-content;
 }
@@ -395,14 +502,194 @@ flex: 1;
   background-color:#4796ff;
   color: white;
   margin-left: 100px;
+  border-top-right-radius: 0px;
 }
 
 .received-message{ 
   background-color: #ddd;
   color: #28282B;
   margin-right: 100px;
+  border-bottom-left-radius: 0px;
 }
-.message-timestamp{
+.message-timestamps{
   width: fit-content;
   font-size: 13px;
+}
+
+/*****************************************************
+************MEDIA QUERY FOR USER LIST*****************
+******************************************************/
+
+/* === Responsive Layout Fixes === */
+@media only screen and (max-width: 768px) {
+  .app-sidebar {
+   
+    padding: 10px 5px;
+  }
+
+  .filtered-user, .selected-user {
+    width: 100%;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .filter-user-display {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .filter-user-details,
+  .user-display-name,
+  .user-display-email,
+  .user-start-chat,
+  .user-start-chat-btn,
+  .unread-message-counter {
+    display: none !important;
+  }
+
+  .user-default-avatar,
+  .user-profile-image,
+  .user-selected-avatar {
+    width: 45px;
+    height: 45px;
+    line-height: 45px;
+    font-size: 18px;
+    margin: 0 auto;
+  }
+
+  .app-chat-area {
+    width: calc(100% - 70px); /* Take remaining space */
+    padding: 10px;
+  }
+
+  .main-content {
+    display: flex;
+    flex-direction: row;
+  }
+}
+
+@media only screen and (max-width: 400px) {
+  .app-header {
+    padding: 18px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .app-user-profile {
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 5px;
+  }
+.img{
+  margin-right: 20px;
+}
+  .logged-user-name {
+    padding-right: 0;
+    max-width: 70%;
+  }
+}
+
+
+.unread-message-counter{
+  text-align: center;
+  float: right;
+  padding-top: 3px;
+  width: 26px;
+  border-radius: 50%;
+  background-color: #4796ff;
+  color: white;
+  font-weight: bold;
+}
+.typing-indicate{
+  font-size: 13px;
+  color: grey;
+}
+
+/*****************************************************
+*************CSS STYLES FOR PROFILE PAGE**************
+******************************************************/
+
+.profile-page-container{
+  display: flex;
+  width: 80%;
+  color: #28282B;
+  margin: 100px auto;
+  padding: 20px 20px;
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.profile-pic-container{
+  width: 30%;
+  display: flex;
+  justify-content: center;
+}
+.profile-info-container{
+  width: 70%;
+  padding: 30px 10px;
+}
+.user-profile-pic-upload, .user-default-profile-avatar{
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  color: #28282B;
+  border: #ddd 5px solid;
+  font-size: 120px;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 240px;
+}
+.app-user-profile img {
+  width: 40px; /* or whatever your avatar size is */
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+
+.user-profile-name{
+  padding: 10px 0px;
+  border-bottom: #cdcdcd 1.5px solid;
+  margin-bottom: 30px;
+}
+.select-profile-pic-container{
+  padding: 30px 0px;
+}
+
+/* file upload button */
+input[type="file"]::file-selector-button {
+  border-radius: 4px;
+  padding: 0 16px;
+  height: 40px;
+  cursor: pointer;
+  background-color: #28282B;
+  color: white;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+  margin-right: 16px;
+  transition: background-color 200ms;
+}
+
+/* file upload button hover state */
+input[type="file"]::file-selector-button:hover {
+  background-color: #f3f4f6;
+  color: #28282B;
+}
+
+/* file upload button active state */
+input[type="file"]::file-selector-button:active {
+  background-color: #e5e7eb;
+  color: #28282B;
+}
+.btn-power-off{
+  background: transparent;
+  color: #3c86e7;
+  margin-right: 5px;
+  position: relative;
+  left: 10px;
+  border: none;
+  font-size: 19px;
+  cursor: pointer;
 }

@@ -1,3 +1,4 @@
 Please remember to install the react
 with npm create-react-app client
 so that all the application can be created.
+install socket.io client
