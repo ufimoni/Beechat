@@ -2,7 +2,7 @@
 import moment from 'moment';
 import {useEffect, useState} from 'react';
 import { useSelector } from 'react-redux';
-import { uploadProfilePic } from '../../apiCalls/user';
+import { uploadProfilePic } from './../../apiCalls/user';
 import { useDispatch } from 'react-redux';
 import { hideLoader, showLoader } from '../../redux/loaderSlice';
 import toast from 'react-hot-toast'
