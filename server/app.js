@@ -40,7 +40,7 @@ app.use('/api/user',userRouter)
 app.use('/api/chat',chatrouter)
 app.use('/api/message',messageRouter);
 app.use('/api',createProxyMiddleware({
-    target: 'http://localhost:5000',
+    target: 'https://beechat-server.onrender.com',
     changeOrigin: true
 }))
 

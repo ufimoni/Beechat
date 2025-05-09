@@ -5,7 +5,7 @@ import ChatArea from './components/chatArea';
 import { useSelector } from 'react-redux';
 import { io } from 'socket.io-client'
 
-const socket = io('http://localhost:5000'); //// connection to the server
+const socket = io('https://beechat-server.onrender.com'); //// connection to the server
 function Home(){
   const { selectedChats, user } = useSelector(state => state.userReducer)
    const [onlineUsers, setOnlineUsers] = useState([]);
