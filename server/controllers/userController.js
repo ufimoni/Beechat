@@ -1,5 +1,5 @@
 const Users = require('./../models/usermodel');
-const cloudinary = require('../cloudinary');
+const cloudinary = require('./../cloudinary');
 
 exports.getUserDetail = async (req, res) => {
     try {
