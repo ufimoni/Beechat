@@ -6,7 +6,7 @@ import { uploadProfilePic } from '../../apiCalls/user';
 import { useDispatch } from 'react-redux';
 import { hideLoader, showLoader } from '../../redux/loaderSlice';
 import toast from 'react-hot-toast'
-import { setUser } from '../../redux/usersSlice';
+import { setUser } from './../../redux/usersSlice';
 
 
 function Profile(){
