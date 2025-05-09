@@ -1,6 +1,5 @@
-const Users = require('./../models/usermodel');
+
 const Chats = require('../models/chatmodel');
-const jwt = require('jsonwebtoken');
 const Messages = require('../models/messagemodel');
 
 exports.CreateNewChats = async (req, res)=>{

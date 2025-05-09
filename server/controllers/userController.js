@@ -1,5 +1,4 @@
 const Users = require('./../models/usermodel');
-const jwt = require('jsonwebtoken');
 const cloudinary = require('../cloudinary');
 
 exports.getUserDetail = async (req, res) => {
