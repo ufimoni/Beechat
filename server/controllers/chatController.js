@@ -1,6 +1,6 @@
 
 const Chats = require('./../models/chatmodel');
-const Messages = require('../models/messagemodel');
+const Messages = require('./../models/messagemodel');
 
 exports.CreateNewChats = async (req, res)=>{
   try{  
