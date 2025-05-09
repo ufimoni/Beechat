@@ -1,5 +1,5 @@
 import axios from 'axios';
-export const url = "http://localhost:5000";
+export const url = "https://beechat-server.onrender.com";
 /// creating the instance of the axios
 export const axiosInstance = axios.create({
     headers:{
