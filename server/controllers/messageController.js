@@ -1,6 +1,6 @@
 const Chats = require('./../models/chatmodel'); // please require the chatmodel or chatschema
 
-const Message = require('./../models/messageModel'); //// Please always Require the MessageSchema.
+const Message = require('./../models/messagemodel'); //// Please always Require the MessageSchema.
 
 exports.newMessage = async (req, res) =>{
     try{
