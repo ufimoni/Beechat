@@ -3,7 +3,7 @@ dotenv.config({path: './config.env'})
 
 const dbconfig = require('./config/dbconfig');
 
-const server = require('./App');
+const server = require('./app');
 
 const port = process.env.port
 server.listen(port, ()=>{
