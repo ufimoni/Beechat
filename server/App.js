@@ -90,4 +90,5 @@ socket.on('user-offline', userId =>{
   io.emit('online-users-active',onlineUsers);
 })
 })
+/// export serer.
 module.exports = server; 
