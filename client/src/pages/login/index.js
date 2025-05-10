@@ -1,7 +1,7 @@
 import React from 'react';
 import {useState} from 'react';
 import { Link } from 'react-router-dom'
-import { LoginUser } from './../../apiCalls/auth';
+import { LoginUser } from './../../api/auth';
 import { useNavigate } from 'react-router-dom';
 import { toast} from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
