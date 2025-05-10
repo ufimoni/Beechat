@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react"; 
 import toast from "react-hot-toast"; 
 import { useDispatch, useSelector } from "react-redux";
-import { createNewMessage, getAllMessage} from '../../../apiCalls/message';
+import { createNewMessage, getAllMessage} from '../../../api/message';
 import { hideLoader, showLoader } from "../../../redux/loaderSlice"; 
-import { clearunreadMessagecount } from '../../../apiCalls/chat';
+import { clearunreadMessagecount } from '../../../api/chat';
 import store from '../../../redux/store';
 
 import EmojiPicker from 'emoji-picker-react'
