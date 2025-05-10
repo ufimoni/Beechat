@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import Header from './components/header';
 import Sidebar from './components/sidebar';
 import ChatArea from './components/chatArea';
