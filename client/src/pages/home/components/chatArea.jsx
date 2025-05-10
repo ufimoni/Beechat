@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createNewMessage, getAllMessage} from './../../../api/message';
 import { hideLoader, showLoader } from "./../../../redux/loaderSlice"; 
 import { clearunreadMessagecount } from './../../../api/chat';
-import store from '../../../redux/store';
+import store from './../../../redux/store';
 
 import EmojiPicker from 'emoji-picker-react'
 
