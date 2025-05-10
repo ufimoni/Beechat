@@ -1,10 +1,10 @@
 import React from 'react';
 import {useState} from 'react';
 import { Link } from 'react-router-dom'
-import { signupUser } from './../../api/auth';
+import { signupUser } from './../../../api/auth';
 import { toast} from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
-import { hideLoader, showLoader } from '../../redux/loaderSlice';
+import { hideLoader, showLoader } from './../../redux/loaderSlice';
 function Signup(){
     const dispatch = useDispatch();
  const [user, setUser] = useState({
