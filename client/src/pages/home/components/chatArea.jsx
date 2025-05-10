@@ -9,7 +9,7 @@ import store from './../../../redux/store';
 import EmojiPicker from 'emoji-picker-react'
 
 import moment from 'moment';
-import { setAllChats } from "../../../redux/usersSlice";
+import { setAllChats } from "./../../../redux/usersSlice";
 
 
 function ChatArea({socket}) {
