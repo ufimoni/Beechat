@@ -1,11 +1,11 @@
 import React from 'react';
 import {useState} from 'react';
 import { Link } from 'react-router-dom'
-import { LoginUser } from '../../apiCalls/auth';
+import { LoginUser } from './../../apiCalls/auth';
 import { useNavigate } from 'react-router-dom';
 import { toast} from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
-import { hideLoader, showLoader } from '../../redux/loaderSlice';
+import { hideLoader, showLoader } from './../../redux/loaderSlice';
 function Login(){
     /// use the usedispathc(). here 
     const dispatch =  useDispatch()
