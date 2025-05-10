@@ -1,11 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { CreateChats } from '../../../apiCalls/chat'
-import { hideLoader, showLoader } from "../../../redux/loaderSlice";
-import { setAllChats, setselectedChats } from "../../../redux/usersSlice";
+import { CreateChats } from './../../../api/chat'
+import { hideLoader, showLoader } from "./../../../redux/loaderSlice";
+import { setAllChats, setselectedChats } from "./../../../redux/usersSlice";
 import moment  from "moment";
 import { useEffect } from "react";
-import store from '../../../redux/store'
+import store from './../../../redux/store'
 
 
 function UsersList({searchKey, socket, onlineUsers}){
