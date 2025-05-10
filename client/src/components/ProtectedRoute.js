@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import { getLoggedUser, getAllUsers } from "../apiCalls/user";
-import { getAllchats } from "../apiCalls/chat";
+import { getLoggedUser, getAllUsers } from "../api/user";
+import { getAllchats } from "../api/chat";
 import { useDispatch, useSelector } from "react-redux";
 import { hideLoader, showLoader } from "../redux/loaderSlice";
 import { setAllUsers, setUser, setAllChats } from "../redux/usersSlice";
